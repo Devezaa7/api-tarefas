@@ -1,51 +1,128 @@
-# API de Tarefas
+# API de Tarefas - To-Do List
 
-Uma API RESTful para gerenciamento de tarefas, permitindo criar, listar, atualizar e deletar tarefas de forma simples e eficiente.
+Uma API RESTful desenvolvida em Node.js para gerenciamento de tarefas, seguindo o padrão MVC (Model-View-Controller) e implementando todas as operações CRUD (Create, Read, Update, Delete).
 
-# Tecnologias
+## 🚀 Tecnologias
 
-- Node.js
-- Express
-- Banco de dados (especifique: MongoDB, PostgreSQL, etc.)
+- **Node.js** - Ambiente de execução JavaScript
+- **Express** - Framework web para criação de APIs
+- **Sequelize** - ORM (Object-Relational Mapper) para manipulação do banco de dados
+- **SQLite** - Banco de dados relacional leve e embutido
+- **dotenv** - Gerenciamento de variáveis de ambiente
+- **Nodemon** - Reinicialização automática do servidor durante o desenvolvimento
+
+## 📁 Estrutura do Projeto
+
+```
+api-tarefas/
+├── src/
+│   ├── config/
+│   │   └── database.js       # Configuração do Sequelize
+│   ├── controllers/
+│   │   └── tarefaController.js  # Lógica de negócio
+│   ├── middlewares/
+│   │   └── logger.js         # Middleware de logs
+│   ├── models/
+│   │   └── tarefa.js         # Model da tarefa (Sequelize)
+│   ├── routes/
+│   │   └── tarefas.js        # Definição das rotas
+│   └── server.js             # Arquivo principal
+├── .env                      # Variáveis de ambiente
+├── .gitignore
+├── package.json
+└── README.md
+```
 
 ## 📋 Pré-requisitos
 
-- Node.js (versão 14 ou superior)
-- npm ou yarn
-- Banco de dados configurado
+- **Node.js** (versão 14 ou superior)
+- **npm** ou **yarn**
 
-# Instalação
+## 🔧 Instalação
 
-1. Clone o repositório:
+1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/api-tarefas.git
+git clone https://github.com/Devezaa7/api-tarefas.git
 cd api-tarefas
 ```
 
-2. Instale as dependências:
+2. **Instale as dependências:**
 ```bash
 npm install
 ```
 
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-```
+3. **Configure as variáveis de ambiente:**
 
-Edite o arquivo `.env` com suas configurações:
-```
+Crie um arquivo `.env` na raiz do projeto:
+```env
 PORT=3000
-DATABASE_URL=sua_conexao_do_banco
+DB_STORAGE=./tarefas.db
 ```
 
-4. Inicie o servidor:
+4. **Inicie o servidor:**
+
+**Modo desenvolvimento (com nodemon):**
+```bash
+npm run dev
+```
+
+**Modo produção:**
 ```bash
 npm start
 ```
 
-# Endpoints
+O servidor estará rodando em `http://localhost:3000`
 
-# Listar todas as tarefas
+## 📡 Endpoints da API
+
+### 📌 Rota Principal
+```http
+GET /
+```
+Retorna informações básicas da API.
+
+**Resposta (200):**
+```json
+{
+  "mensagem": "API de Tarefas",
+  "versao": "1.0.0"
+}
+```
+
+### ✅ Criar uma Tarefa
+```http
+POST /tarefas
+```
+
+**Body:**
+```json
+{
+  "titulo": "Estudar Node.js",
+  "descricao": "Revisar conceitos de API REST e Sequelize",
+  "status": "a fazer"
+}
+```
+
+**Resposta de sucesso (201):**
+```json
+{
+  "id": 1,
+  "titulo": "Estudar Node.js",
+  "descricao": "Revisar conceitos de API REST e Sequelize",
+  "status": "a fazer",
+  "criadoEm": "2025-11-08T10:00:00.000Z",
+  "atualizadoEm": "2025-11-08T10:00:00.000Z"
+}
+```
+
+**Validações:**
+- `titulo` é obrigatório e não pode ser vazio
+- `status` deve ser um dos valores: `"a fazer"`, `"em andamento"`, `"concluída"`
+- Se `status` não for informado, o valor padrão será `"a fazer"`
+
+---
+
+### 📋 Listar Todas as Tarefas
 ```http
 GET /tarefas
 ```
@@ -57,15 +134,33 @@ GET /tarefas
     "id": 1,
     "titulo": "Estudar Node.js",
     "descricao": "Revisar conceitos de API REST",
-    "concluida": false,
-    "criadaEm": "2025-11-08T10:00:00Z"
+    "status": "em andamento",
+    "criadoEm": "2025-11-08T10:00:00.000Z",
+    "atualizadoEm": "2025-11-08T11:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "titulo": "Fazer compras",
+    "descricao": "Comprar itens do mercado",
+    "status": "a fazer",
+    "criadoEm": "2025-11-08T09:00:00.000Z",
+    "atualizadoEm": "2025-11-08T09:00:00.000Z"
   }
 ]
 ```
 
-# Buscar tarefa por ID
+*As tarefas são ordenadas da mais recente para a mais antiga.*
+
+---
+
+### 🔍 Buscar Tarefa por ID
 ```http
 GET /tarefas/:id
+```
+
+**Exemplo:**
+```http
+GET /tarefas/1
 ```
 
 **Resposta de sucesso (200):**
@@ -74,36 +169,22 @@ GET /tarefas/:id
   "id": 1,
   "titulo": "Estudar Node.js",
   "descricao": "Revisar conceitos de API REST",
-  "concluida": false,
-  "criadaEm": "2025-11-08T10:00:00Z"
+  "status": "em andamento",
+  "criadoEm": "2025-11-08T10:00:00.000Z",
+  "atualizadoEm": "2025-11-08T11:00:00.000Z"
 }
 ```
 
-# Criar nova tarefa
-```http
-POST /tarefas
-```
-
-**Body:**
+**Resposta de erro (404):**
 ```json
 {
-  "titulo": "Nova tarefa",
-  "descricao": "Descrição da tarefa"
+  "erro": "Tarefa não encontrada"
 }
 ```
 
-**Resposta de sucesso (201):**
-```json
-{
-  "id": 2,
-  "titulo": "Nova tarefa",
-  "descricao": "Descrição da tarefa",
-  "concluida": false,
-  "criadaEm": "2025-11-08T11:00:00Z"
-}
-```
+---
 
-# Atualizar tarefa
+### ✏️ Atualizar uma Tarefa (Completa)
 ```http
 PUT /tarefas/:id
 ```
@@ -111,76 +192,146 @@ PUT /tarefas/:id
 **Body:**
 ```json
 {
-  "titulo": "Tarefa atualizada",
-  "descricao": "Nova descrição",
-  "concluida": true
+  "titulo": "Estudar Node.js - Atualizado",
+  "descricao": "Revisar conceitos avançados de API REST",
+  "status": "concluída"
 }
 ```
 
 **Resposta de sucesso (200):**
 ```json
 {
-  "id": 1,
-  "titulo": "Tarefa atualizada",
-  "descricao": "Nova descrição",
-  "concluida": true,
-  "atualizadaEm": "2025-11-08T12:00:00Z"
+  "mensagem": "Tarefa atualizada com sucesso",
+  "tarefa": {
+    "id": 1,
+    "titulo": "Estudar Node.js - Atualizado",
+    "descricao": "Revisar conceitos avançados de API REST",
+    "status": "concluída",
+    "criadoEm": "2025-11-08T10:00:00.000Z",
+    "atualizadoEm": "2025-11-08T12:00:00.000Z"
+  }
 }
 ```
 
-# Deletar tarefa
+**Validações:**
+- `titulo` é obrigatório e não pode ser vazio
+
+---
+
+### 🔄 Atualizar Status de uma Tarefa (Parcial)
+```http
+PATCH /tarefas/:id/status
+```
+
+**Body:**
+```json
+{
+  "status": "concluída"
+}
+```
+
+**Resposta de sucesso (200):**
+```json
+{
+  "mensagem": "Status atualizado com sucesso",
+  "tarefa": {
+    "id": 1,
+    "titulo": "Estudar Node.js",
+    "descricao": "Revisar conceitos de API REST",
+    "status": "concluída",
+    "criadoEm": "2025-11-08T10:00:00.000Z",
+    "atualizadoEm": "2025-11-08T13:00:00.000Z"
+  }
+}
+```
+
+**Validações:**
+- `status` é obrigatório
+- `status` deve ser um dos valores: `"a fazer"`, `"em andamento"`, `"concluída"`
+
+---
+
+### 🗑️ Deletar uma Tarefa
 ```http
 DELETE /tarefas/:id
 ```
 
-**Resposta de sucesso (204):**
-Sem conteúdo no corpo da resposta.
-
-# Autenticação
-
-(Se aplicável) Esta API utiliza autenticação via Bearer Token. Inclua o token no header de suas requisições:
-
+**Exemplo:**
 ```http
-Authorization: Bearer seu_token_aqui
+DELETE /tarefas/1
 ```
 
-# Códigos de Status
-
-- `200` - Sucesso
-- `201` - Criado com sucesso
-- `204` - Sem conteúdo (deleção bem-sucedida)
-- `400` - Requisição inválida
-- `401` - Não autorizado
-- `404` - Não encontrado
-- `500` - Erro interno do servidor
-
-# Testes
-
-Execute os testes com:
-```bash
-npm test
+**Resposta de sucesso (200):**
+```json
+{
+  "mensagem": "Tarefa deletada com sucesso"
+}
 ```
 
-# Exemplos de Uso
+**Resposta de erro (404):**
+```json
+{
+  "erro": "Tarefa não encontrada"
+}
+```
 
-# Com cURL
+---
+
+## ⚠️ Códigos de Status HTTP
+
+| Código | Descrição |
+|--------|-----------|
+| `200` | Requisição bem-sucedida |
+| `201` | Recurso criado com sucesso |
+| `400` | Requisição inválida (erro de validação) |
+| `404` | Recurso não encontrado |
+| `500` | Erro interno do servidor |
+
+## 🏗️ Arquitetura MVC
+
+O projeto segue o padrão **MVC (Model-View-Controller)** com clara separação de responsabilidades:
+
+- **Models** (`src/models/`): Define a estrutura dos dados usando Sequelize ORM
+- **Controllers** (`src/controllers/`): Contém a lógica de negócio da aplicação
+- **Routes** (`src/routes/`): Define os endpoints e mapeia para os controllers
+- **Middlewares** (`src/middlewares/`): Funções intermediárias (ex: logger)
+- **Config** (`src/config/`): Configurações da aplicação (banco de dados, etc.)
+
+## 🧪 Testando a API
+
+### Com cURL
+
+**Criar uma tarefa:**
 ```bash
-# Listar tarefas
-curl http://localhost:3000/tarefas
-
-# Criar tarefa
 curl -X POST http://localhost:3000/tarefas \
   -H "Content-Type: application/json" \
-  -d '{"titulo":"Minha tarefa","descricao":"Descrição"}'
+  -d '{
+    "titulo": "Minha primeira tarefa",
+    "descricao": "Descrição da tarefa",
+    "status": "a fazer"
+  }'
 ```
 
-# Com JavaScript (fetch)
-```javascript
-// Listar tarefas
-fetch('http://localhost:3000/tarefas')
-  .then(response => response.json())
-  .then(data => console.log(data));
+**Listar tarefas:**
+```bash
+curl http://localhost:3000/tarefas
+```
 
+**Atualizar status:**
+```bash
+curl -X PATCH http://localhost:3000/tarefas/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "concluída"}'
+```
+
+**Deletar tarefa:**
+```bash
+curl -X DELETE http://localhost:3000/tarefas/1
+```
+
+### Com JavaScript (fetch)
+
+```javascript
 // Criar tarefa
 fetch('http://localhost:3000/tarefas', {
   method: 'POST',
@@ -189,29 +340,67 @@ fetch('http://localhost:3000/tarefas', {
   },
   body: JSON.stringify({
     titulo: 'Minha tarefa',
-    descricao: 'Descrição da tarefa'
+    descricao: 'Descrição da tarefa',
+    status: 'a fazer'
   })
 })
   .then(response => response.json())
   .then(data => console.log(data));
+
+// Listar tarefas
+fetch('http://localhost:3000/tarefas')
+  .then(response => response.json())
+  .then(data => console.log(data));
 ```
 
-# Contribuindo
+## 📝 Variáveis de Ambiente
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+```env
+# Porta do servidor
+PORT=3000
+
+# Caminho do banco de dados SQLite
+DB_STORAGE=./tarefas.db
+```
+
+## 🔒 Boas Práticas Implementadas
+
+- ✅ Separação de responsabilidades (MVC)
+- ✅ Validação de dados de entrada
+- ✅ Tratamento de erros
+- ✅ Uso de variáveis de ambiente (.env)
+- ✅ Middleware customizado (logger)
+- ✅ Códigos de status HTTP apropriados
+- ✅ ORM (Sequelize) para manipulação do banco de dados
+- ✅ Nomenclatura clara e consistente
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para:
+
+1. Fazer um fork do projeto
+2. Criar uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
 3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
 4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um Pull Request
+5. Abrir um Pull Request
 
-# Licença
+## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está sob a licença ISC.
 
-# Autor
+## 👤 Autor
 
-Seu Nome - [@seu-usuario](https://github.com/seu-usuario)
+**Deveza** - [GitHub](https://github.com/Devezaa7)
 
-# Suporte
+## 🔗 Links Úteis
 
-Para suporte, envie um email para seuemail@exemplo.com ou abra uma issue no GitHub.
+- [Repositório no GitHub](https://github.com/Devezaa7/api-tarefas)
+- [Documentação do Express](https://expressjs.com/)
+- [Documentação do Sequelize](https://sequelize.org/)
+- [Documentação do Node.js](https://nodejs.org/)
+
+---
+
+⭐ Se este projeto te ajudou, considere dar uma estrela no repositório!
